@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StudentManagement.Students;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -24,6 +25,8 @@ public class StudentManagementDbContext :
     ITenantManagementDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
+    public DbSet<Student> Students { get; set; }
+
 
     #region Entities from the modules
 
@@ -63,6 +66,12 @@ public class StudentManagementDbContext :
         base.OnModelCreating(builder);
 
         /* Include modules to your migration db context */
+        builder.Entity<Student>(b =>
+        {
+            b.HasKey(x => x.Id); // khóa chính là StudentCode
+            b.Property(x => x.StudentName).IsRequired().HasMaxLength(128);
+            b.Property(x => x.GPA);
+        });
 
         builder.ConfigurePermissionManagement();
         builder.ConfigureSettingManagement();
