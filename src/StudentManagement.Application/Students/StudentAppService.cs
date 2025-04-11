@@ -8,6 +8,8 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
+
 
 namespace StudentManagement.Students
 {
@@ -20,18 +22,13 @@ namespace StudentManagement.Students
         {
         }
 
-        protected override async Task<Student> MapToEntityAsync(CreateUpdateStudentDto createInput)
+        public async Task<double> GetAverageGpaAsync()
         {
-            // Override vì ta dùng StudentCode làm key -> không tự sinh Guid
-            throw new AbpException("StudentCode is required for creation. Use CreateWithCodeAsync method instead.");
+            var students = await Repository.GetListAsync();
+            if (!students.Any()) return 0;
+
+            return students.Average(x => x.GPA);
         }
-            
-        // Custom Create method nhận StudentCode
-        public async Task<StudentDto> CreateWithCodeAsync(string studentCode, CreateUpdateStudentDto input)
-        {
-            var student = new Student(studentCode, input.StudentName, input.GPA);
-            await Repository.InsertAsync(student, autoSave: true);
-            return MapToGetOutputDto(student);
-        }
+
     }
 }
