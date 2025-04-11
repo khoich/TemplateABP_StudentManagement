@@ -7,8 +7,8 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
-using Microsoft.Extensions.Logging;
 using StudentManagement.Redis;
+using System.Runtime.InteropServices;
 
 namespace StudentManagement.Students
 {
@@ -22,7 +22,7 @@ namespace StudentManagement.Students
         {
             _redis = new RedisHelper();
         }
-
+        
         public override async Task<StudentDto> CreateAsync(CreateUpdateStudentDto input)
         {
             var student = new Student(input.StudentCode, input.StudentName, input.GPA);
@@ -70,5 +70,12 @@ namespace StudentManagement.Students
             await _redis.RemoveAsync($"student:{id}");
         }
 
+        public async Task<double> GetAverageGpaAsync()
+        {
+            var students = await Repository.GetListAsync();
+            if (!students.Any()) return 0;
+
+            return students.Average(x => x.GPA);
+        }
     }
 }
